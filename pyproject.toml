@@ -1,0 +1,18 @@
+[project]
+name = "z-linters"
+version = "0.0.0.dev0"
+description = "awful linting done slowly"
+license = "MIT"
+authors = [
+    {name = "ScatteredComet",email = "benjaminleogreen@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "clang (>=21.1.7,<22.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
