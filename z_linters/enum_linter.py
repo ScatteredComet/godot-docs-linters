@@ -66,7 +66,8 @@ def main():
     
     violation_number : int = 0
     
-    paths = [Path("core/"), Path("modules/"), Path("scene/"), Path("servers/")]
+    # paths = [Path("core/"), Path("modules/"), Path("scene/"), Path("servers/")]
+    paths = [Path("core/"), Path("modules/"), Path("scene/")]
     # paths = [Path("../servers/")]
     to_chain = []
 
@@ -81,7 +82,7 @@ def main():
         debug_mode = False
         enum_name : str = ""
 
-        if "modules/gdscript" in str(p) or "extensions" in str(p):
+        if "modules/gdscript" in str(p) or "extensions" in str(p) or "profiler" in str(p):
             continue
 
         with open(p) as file:
@@ -91,7 +92,9 @@ def main():
                         enum_started = False
                         continue
                     
-                    if enum_name_found: # only check if we know there is documentation for this enum
+                    uppercase_count = sum(1 for char in enum_name if char.isupper())
+
+                    if enum_name_found and uppercase_count > 1: # only check if we know there is documentation for this enum, and the enum name is interesting
                         # strip last comma from line and leading whitespace; then try to find that string in a *.xml.
                         stripped = line.strip()
                         if stripped:
@@ -101,10 +104,12 @@ def main():
                             if not cached_found_in_xml(re.compile(rf"{enum_value_name}")):
                                 type_val = f"Type: value        {enum_value_name}"
                                 if "MAX" in enum_value_name:
-                                    tqdm.write(f"{violation_number:<10} {GREEN}Documentation missing for enum:{RESET} {enum_name:<50} {YELLOW}{type_val:<100}{RESET} {p}")
+                                    pass
+                                    # tqdm.write(f"{violation_number:<10} {GREEN}Documentation missing for enum:{RESET} {enum_name:<50} {YELLOW}{type_val:<100}{RESET} {p}")
                                 else:
                                     tqdm.write(f"{violation_number:<10} {GREEN}Documentation missing for enum:{RESET} {enum_name:<50} {type_val:<100} {p}")
-                                violation_number += 1
+                                    violation_number += 1
+                                    pass
                 
                 match = enum_line.search(line)
 
@@ -115,8 +120,11 @@ def main():
                     if not cached_simple_found_in_xml(rf'enum="{enum_name}"', debug_mode):
                         enum_name_found = False
                         type_all = "Type: all"
-                        tqdm.write(f"{violation_number:<10} {LIGHT_BLUE}Documentation missing for enum:{RESET} {enum_name:<50} {type_all:<100} {p}")
-                        violation_number += 1
+
+                        uppercase_count = sum(1 for char in enum_name if char.isupper())
+                        if (uppercase_count > 1):
+                            tqdm.write(f"{violation_number:<10} {LIGHT_BLUE}Documentation missing for enum:{RESET} {enum_name:<50} {type_all:<100} {p}")
+                            violation_number += 1
                     else:
                         enum_name_found = True
 
